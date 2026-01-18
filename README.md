@@ -1,14 +1,17 @@
 # Secure RAG: Privacy-Preserving Vector Retrieval via Orthogonal Chaotic Maps
 
+> **Status:** ✅ Verified Prototype (100% Isometry Preservation)
+> **Core Tech:** NumPy, Logistic Map (Chaos Theory), QR Decomposition
+> **License:** MIT Open Source
+
 **Author:** Wajahat Hassan
 **Date:** January 2026
-**Status:** Prototype / Experimental Validation
 
-## 1. Abstract
+## Abstract
 
 Retrieval-Augmented Generation (RAG) systems rely on vector embeddings that, if leaked, can be inverted to reconstruct the original sensitive text. This research proposes a lightweight encryption method using **Orthogonal Chaotic Maps**. By generating unique orthogonal matrices via the Logistic Map, we rotate embedding vectors in high-dimensional space. This transformation preserves the Euclidean distance between vectors - ensuring retrieval accuracy remains 100%, while rendering the raw vectors unintelligible to attackers without the chaotic initial conditions (keys).
 
-## 2. Introduction
+## 1. Introduction
 
 Standard RAG architectures store user data as plaintext vector embeddings. Recent studies (Morris et al., 2023) demonstrate that these embeddings can be inverted to recover private information. Current solutions like Homomorphic Encryption (HE) are often too computationally expensive for real-time chat applications.
 
@@ -18,6 +21,26 @@ To implement a "Secure RAG" layer that:
 1. Encrypts embeddings before storage.
 2. Preserves exact distance relationships (Isometry) for search.
 3. Operates with negligible latency overhead.
+
+## 2. Architecture Concept
+
+The system enables a "Zero-Knowledge" retrieval workflow. The cloud database stores only chaotic-encrypted vectors and never sees the raw user embeddings.
+
+```text
+[Client Side]                               [Cloud Side]
+   |                                            |
+   +-- 1. Embed("Secret Query") -> v            |
+   |                                            |
+   +-- 2. ChaosEncrypt(v, key) -> v_encrypted   |
+   |      (Rotation via Orthogonal Matrix)      |
+   |                                            |
+   +------------------------------------------> +-- 3. Search(v_encrypted)
+                                                |      (Compute Distances)
+                                                |
+   +<------------------------------------------ +-- 4. Return Top-K Indices
+   |                                            |
+   +-- 5. Retrieve & Decrypt (Optional)         |
+```
 
 ## 3. Methodology
 
@@ -72,14 +95,24 @@ Using `src/search_simulation.py`, we simulated a mini-RAG environment with a "Qu
 - **Success Rate:** 100% (5/5 trials).
 - **Observation:** The system correctly identified the hidden target match every time, solely based on encrypted distances.
 
-## 5. Usage
+## 5. Project Structure
 
-### 5.1 Installation
+```text
+src/
+├── chaos_engine.py      # Core Logic: Logistic Map & Matrix Generation
+├── mock_data.py         # Utils: Generates normalized test vectors
+├── experiment.py        # Proof 1: Verifies distance preservation (Isometry)
+└── search_simulation.py # Proof 2: Simulates full RAG retrieval cycle
+```
+
+## 6. Usage
+
+### 6.1 Installation
 
 No heavy frameworks are required for the core logic.
 `pip install -r requirements.txt`
 
-### 5.2 Reproducing Results
+### 6.2 Reproducing Results
 
 **Experiment 1: Isometry Proof**
 Verifies that the distance distortion is effectively zero.
@@ -89,7 +122,7 @@ Verifies that the distance distortion is effectively zero.
 Runs a mock RAG retrieval on encrypted vectors.
 `python src/search_simulation.py`
 
-## 6. References
+## 7. References
 
 1.  **Morris, J. X., et al. (2023).** _Text Embeddings Reveal (Almost) As Much As Text._ arXiv preprint arXiv:2310.06816.
 2.  **May, R. M. (1976).** _Simple mathematical models with very complicated dynamics._ Nature, 261(5560), 459-467.
