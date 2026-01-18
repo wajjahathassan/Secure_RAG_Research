@@ -122,6 +122,29 @@ Verifies that the distance distortion is effectively zero.
 Runs a mock RAG retrieval on encrypted vectors.
 `python src/search_simulation.py`
 
+### 6.3 Library Usage (Python API)
+
+You can import the core engine to secure your own vector database.
+
+```python
+import numpy as np
+from src.secure_rag import SecureVectorEngine
+
+# 1. Initialize
+# secret_key (0-1) acts as the chaotic seed
+engine = SecureVectorEngine(secret_key=0.45, dimension=128)
+
+# 2. Encrypt Data
+# raw_vectors shape: (N, 128)
+encrypted_db = engine.encrypt_batch(raw_vectors)
+
+# 3. Encrypt Query
+encrypted_query = engine.encrypt_single(user_query)
+
+# 4. Search (Standard Euclidean Distance on Encrypted Data)
+indices, distances = engine.search(encrypted_query, encrypted_db, top_k=3)
+```
+
 ## 7. References
 
 1.  **Morris, J. X., et al. (2023).** _Text Embeddings Reveal (Almost) As Much As Text._ arXiv preprint arXiv:2310.06816.
